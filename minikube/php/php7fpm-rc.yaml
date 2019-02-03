@@ -1,0 +1,45 @@
+  apiVersion: v1
+  kind: ReplicationController
+  metadata:
+    name: php7-fpm
+  spec:
+    replicas: 1
+    selector:
+      app: php7-fpm
+    template:
+      metadata:
+        name: php7-fpm
+        labels:
+          app: php7-fpm
+      spec:
+        containers:
+        - name: phpfpm
+          image: allansimon/php7-fpm-postgresql
+          ports:
+          - containerPort: 9000
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: user
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: password
+
+            - name: POSTGRES_HOST
+              value: postgres-service
+
+            - name: REDIS_HOST
+              value: redis-service
+              
+          volumeMounts:
+            - mountPath: /var/www/html
+              name: web
+        volumes:
+        - name: web
+          hostPath:
+            path: /deploy/public

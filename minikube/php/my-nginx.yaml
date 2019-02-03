@@ -1,0 +1,52 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: my-nginx
+spec:
+  selector:
+    matchLabels:
+      run: my-nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: my-nginx
+    spec:
+      volumes:
+      - name: config
+        configMap:
+          name: nginx-config
+      containers:
+      - name: my-nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+        env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: user
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: password
+
+            - name: POSTGRES_HOST
+              value: postgres-service
+
+            - name: REDIS_HOST
+              value: redis-service
+              
+        volumeMounts:
+        - mountPath: "/etc/nginx/nginx.conf"
+          name: config
+          subPath: nginx.conf
+          # mountPath - mount path where to put on the server
+        - mountPath: "/etc/nginx/conf.d/app.conf"
+          # name - name of a volume
+          name: config
+          # subPath - mount there without affecting other files on the server
+          subPath: app.conf

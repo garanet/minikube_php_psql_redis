@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: default
+data:
+  app.conf: |
+    server {
+          listen 80 default_server;
+          index index.php;
+          error_log /var/log/nginx/error.log error;
+          access_log /var/log/nginx/access.log;
+          client_max_body_size 32M;
+          location ~ /\. {
+            log_not_found off;
+            deny all;
+            access_log off;
+          }
+          location ~ \.php$ {
+            fastcgi_param  QUERY_STRING       $query_string;
+            fastcgi_param  REQUEST_METHOD     $request_method;
+            fastcgi_param  REQUEST_URI        $request_uri;
+            fastcgi_param  CONTENT_TYPE       $content_type;
+            fastcgi_param  CONTENT_LENGTH     $content_length;
+            fastcgi_param  SCRIPT_NAME        $fastcgi_script_name;
+            fastcgi_param  HTTPS              $http_x_forwarded_proto;
+            fastcgi_param SCRIPT_FILENAME /var/www/html$fastcgi_script_name;
+            fastcgi_pass phpfpm:9000;
+          }
+          location / {
+            try_files $uri $uri/ /index.php?$query_string;
+          }
+        }
+  nginx.conf: |
+    user  nginx;
+    worker_processes  1;
+
+    error_log  /var/log/nginx/error.log warn;
+    pid        /var/run/nginx.pid;
+
+
+    events {
+        worker_connections  1024;
+    }
+
+
+    http {
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+
+        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                          '$status $body_bytes_sent "$http_referer" '
+                          '"$http_user_agent" "$http_x_forwarded_for"';
+
+        access_log  /var/log/nginx/access.log  main;
+
+        sendfile        on;
+        #tcp_nopush     on;
+
+        keepalive_timeout  65;
+
+        #gzip  on;
+
+        include /etc/nginx/conf.d/*.conf;
+        include /etc/nginx/sites-enabled/*.conf;
+    }
