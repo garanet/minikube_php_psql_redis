@@ -1,5 +1,6 @@
 # minikube_php_psql_redis
 The environment using Minikube to show a simple PHP page with PostgreSQL and Redis.
+
 Tested on MacOsx with:
 - Docker version 18.09.1, build 4c52b90
 - minikube version: v0.33.1
@@ -41,3 +42,5 @@ minikube service my-nginx
 #note: You need to change the HostPath in minikube/postgres/volume.yaml with your relative volumes path
 
 #note: If you need to change the password for the postgres user run > echo -n "YourPassword" | base64 and change it on minikube/postgres/secret.yaml
+
+#note: Developers can use the Shared Public folder to change the php code.
