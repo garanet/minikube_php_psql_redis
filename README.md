@@ -10,13 +10,13 @@ minikube dashboard
 ```
 
 ###
-# steps to create
+# Steps to create the environment
 ```sh
 kubectl create -f minikube/php/
 kubectl create -f minikube/postgres/
 kubectl create -f minikube/redis/
 ```
-# ssh into nginx container
+# ssh into nginx or phpfpm containers
 ```sh
 kubectl exec -it [pod name] -c my-nginx bash
 kubectl exec -it [pod name] -c phpfpm bash
@@ -26,5 +26,7 @@ kubectl exec -it [pod name] -c phpfpm bash
 ```sh
 minikube service my-nginx
 ```
-#note: change password for the postgres user run > echo -n "test" | base64
+##note: If you need to change the password for the postgres user run > echo -n "YourPassword" | base64 and change it on minikube/postgres/secret.yaml
+##note: You need to change the HostPath in minikube/php/php7fpm-rc.yaml with your relative volumes path
+## note: You need to change the HostPath in minikube/postgres/volume.yaml with your relative volumes path
 
