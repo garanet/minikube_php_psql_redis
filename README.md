@@ -20,6 +20,7 @@ minikube dashboard
 # Steps to create the environment
 ```sh
 git clone https://github.com/garanet/minikube_php_psql_redis.git
+cd minikube_php_psql_redis/
 kubectl create -f minikube/php/
 kubectl create -f minikube/postgres/
 kubectl create -f minikube/redis/
